@@ -17,7 +17,7 @@ export * from './option/index';
 export * from './placeholder/placeholder-options';
 export * from './ripple/index';
 export * from './selection/index';
-export * from './style/index';
+
 
 // TODO: don't have this
 export * from './testing/month-constants';

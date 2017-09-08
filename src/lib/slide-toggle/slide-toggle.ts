@@ -27,7 +27,6 @@ import {
 } from '@angular/core';
 import {ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 import {
-  applyCssTransform,
   CanColor,
   CanDisable,
   CanDisableRipple,
@@ -151,7 +150,7 @@ export class MatSlideToggle extends _MatSlideToggleMixinBase implements OnDestro
   }
 
   ngAfterContentInit() {
-    this._slideRenderer = new SlideToggleRenderer(this._elementRef, this._platform);
+    this._slideRenderer = new SlideToggleRenderer(this._elementRef, this._platform, this._renderer);
 
     this._focusMonitor.monitor(this._inputElement.nativeElement, false)
       .subscribe(focusOrigin => this._onInputFocusChange(focusOrigin));
@@ -313,7 +312,7 @@ class SlideToggleRenderer {
   /** Whether the thumb is currently being dragged. */
   dragging: boolean = false;
 
-  constructor(elementRef: ElementRef, platform: Platform) {
+  constructor(elementRef: ElementRef, platform: Platform, private _renderer: Renderer2) {
     // We only need to interact with these elements when we're on the browser, so only grab
     // the reference in that case.
     if (platform.isBrowser) {
@@ -341,7 +340,7 @@ class SlideToggleRenderer {
     this._thumbEl.classList.remove('mat-dragging');
 
     // Reset the transform because the component will take care of the thumb position after drag.
-    applyCssTransform(this._thumbEl, '');
+    this._renderer.setStyle(this._thumbEl, 'transform', '');
 
     return this.dragPercentage > 50;
   }
@@ -350,8 +349,8 @@ class SlideToggleRenderer {
   updateThumbPosition(distance: number) {
     this.dragPercentage = this._getDragPercentage(distance);
     // Calculate the moved distance based on the thumb bar width.
-    let dragX = (this.dragPercentage / 100) * this._thumbBarWidth;
-    applyCssTransform(this._thumbEl, `translate3d(${dragX}px, 0, 0)`);
+    const dragX = (this.dragPercentage / 100) * this._thumbBarWidth;
+    this._renderer.setStyle(this._thumbEl, 'transform', `translate3d(${dragX}px, 0, 0)`);
   }
 
   /** Retrieves the percentage of thumb from the moved distance. Percentage as fraction of 100. */
