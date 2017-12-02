@@ -1,8 +1,10 @@
 <ng-content select="mat-expansion-panel-header"></ng-content>
 <div class="mat-expansion-panel-content"
-     [class.mat-expanded]="expanded"
      [@bodyExpansion]="_getExpandedState()"
-     [id]="id">
+     (@bodyExpansion.done)="_bodyAnimation($event)"
+     (@bodyExpansion.start)="_bodyAnimation($event)"
+     [id]="id"
+     #body>
   <div class="mat-expansion-panel-body">
     <ng-content></ng-content>
     <ng-template [cdkPortalOutlet]="_portal"></ng-template>
