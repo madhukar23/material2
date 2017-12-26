@@ -152,6 +152,9 @@ export class CdkStepper implements OnDestroy {
   get selectedIndex() { return this._selectedIndex; }
   set selectedIndex(index: number) {
     if (this._steps) {
+      // Ensure that the index can't be out of bounds.
+      index = Math.max(0, Math.min(this._steps.length - 1, index || 0));
+
       if (this._anyControlsInvalidOrPending(index) || index < this._selectedIndex &&
           !this._steps.toArray()[index].editable) {
         // remove focus from clicked step header if the step is not able to be selected
@@ -164,7 +167,7 @@ export class CdkStepper implements OnDestroy {
       this._selectedIndex = this._focusIndex = index;
     }
   }
-  private _selectedIndex: number = 0;
+  private _selectedIndex = 0;
 
   /** The step that is selected. */
   @Input()

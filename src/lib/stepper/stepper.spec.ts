@@ -51,6 +51,30 @@ describe('MatHorizontalStepper', () => {
       expect(stepperComponent.selectedIndex).toBe(0);
     });
 
+    it('should not throw when a negative `selectedIndex` is assigned', () => {
+      const stepperComponent: MatHorizontalStepper = fixture.debugElement
+          .query(By.css('mat-horizontal-stepper')).componentInstance;
+
+      expect(() => {
+        stepperComponent.selectedIndex = -10;
+        fixture.detectChanges();
+      }).not.toThrow();
+
+      expect(stepperComponent.selectedIndex).toBe(0);
+    });
+
+    it('should not throw when an out-of-bounds `selectedIndex` is assigned', () => {
+      const stepperComponent: MatHorizontalStepper = fixture.debugElement
+          .query(By.css('mat-horizontal-stepper')).componentInstance;
+
+      expect(() => {
+        stepperComponent.selectedIndex = 1337;
+        fixture.detectChanges();
+      }).not.toThrow();
+
+      expect(stepperComponent.selectedIndex).toBe(2);
+    });
+
     it('should change selected index on header click', () => {
       let stepHeaders = fixture.debugElement.queryAll(By.css('.mat-horizontal-stepper-header'));
       assertSelectionChangeOnHeaderClick(fixture, stepHeaders);
