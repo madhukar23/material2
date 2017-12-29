@@ -6,6 +6,7 @@ import {createKeyboardEvent} from '../testing/event-objects';
 import {ActiveDescendantKeyManager} from './activedescendant-key-manager';
 import {FocusKeyManager} from './focus-key-manager';
 import {ListKeyManager} from './list-key-manager';
+import {Subject} from 'rxjs/Subject';
 
 
 class FakeFocusable {
@@ -22,11 +23,13 @@ class FakeHighlightable {
 }
 
 class FakeQueryList<T> extends QueryList<T> {
+  changes = new Subject<FakeQueryList<T>>();
   items: T[];
   get length() { return this.items.length; }
   get first() { return this.items[0]; }
   toArray() { return this.items; }
   some() { return this.items.some.apply(this.items, arguments); }
+  notifyOnChanges() { this.changes.next(this); }
 }
 
 
@@ -65,6 +68,17 @@ describe('Key managers', () => {
       keyManager.setFirstItemActive();
 
       spyOn(keyManager, 'setActiveItem').and.callThrough();
+    });
+
+    it('should maintain the active item if the amount of items changes', () => {
+      expect(keyManager.activeItemIndex).toBe(0);
+      expect(keyManager.activeItem!.getLabel()).toBe('one');
+
+      itemList.items.unshift(new FakeFocusable('zero'));
+      itemList.notifyOnChanges();
+
+      expect(keyManager.activeItemIndex).toBe(1);
+      expect(keyManager.activeItem!.getLabel()).toBe('one');
     });
 
     describe('Key events', () => {
