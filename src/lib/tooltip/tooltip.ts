@@ -44,6 +44,7 @@ import {
 } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Subject} from 'rxjs/Subject';
+import {BreakpointObserver, Breakpoints, BreakpointState} from '@angular/cdk/layout';
 
 
 export type TooltipPosition = 'left' | 'right' | 'above' | 'below' | 'before' | 'after';
@@ -518,7 +519,12 @@ export class TooltipComponent {
   /** Subject for notifying that the tooltip has been hidden from the view */
   private _onHide: Subject<any> = new Subject();
 
-  constructor(private _changeDetectorRef: ChangeDetectorRef) {}
+  /** Stream that emits whether the user has a handset-sized display.  */
+  _isHandset: Observable<BreakpointState> = this._breakpointObserver.observe(Breakpoints.Handset);
+
+  constructor(
+    private _changeDetectorRef: ChangeDetectorRef,
+    private _breakpointObserver: BreakpointObserver) {}
 
   /**
    * Shows the tooltip with an animation originating from the provided origin
