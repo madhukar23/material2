@@ -17,6 +17,7 @@ import {
   AfterContentInit,
   ChangeDetectionStrategy,
   Component,
+  ContentChild,
   ContentChildren,
   ElementRef,
   EventEmitter,
@@ -38,6 +39,7 @@ import {matMenuAnimations} from './menu-animations';
 import {throwMatMenuInvalidPositionX, throwMatMenuInvalidPositionY} from './menu-errors';
 import {MatMenuItem} from './menu-item';
 import {MatMenuPanel} from './menu-panel';
+import {MatMenuContent} from './menu-content';
 import {MenuPositionX, MenuPositionY} from './menu-positions';
 import {coerceBooleanProperty} from '@angular/cdk/coercion';
 
@@ -127,6 +129,12 @@ export class MatMenu implements AfterContentInit, MatMenuPanel, OnDestroy {
 
   /** List of the items inside of a menu. */
   @ContentChildren(MatMenuItem) items: QueryList<MatMenuItem>;
+
+  /**
+   * Menu content that will be rendered lazily.
+   * @docs-private
+   */
+  @ContentChild(MatMenuContent) lazyContent: MatMenuContent;
 
   /** Whether the menu should overlap its trigger. */
   @Input()
@@ -232,7 +240,14 @@ export class MatMenu implements AfterContentInit, MatMenuPanel, OnDestroy {
    * to focus the first item when the menu is opened by the ENTER key.
    */
   focusFirstItem() {
-    this._keyManager.setFirstItemActive();
+    // When the content is rendered lazily, it takes a bit before the items are inside the DOM.
+    if (this.lazyContent) {
+      this._ngZone.onStable.asObservable()
+        .pipe(take(1))
+        .subscribe(() => this._keyManager.setFirstItemActive());
+    } else {
+      this._keyManager.setFirstItemActive();
+    }
   }
 
   /**
