@@ -1024,6 +1024,18 @@ describe('MatDialog', () => {
           .toBe(title.id, 'Expected the aria-labelledby to match the title id.');
     }));
 
+    it('should set the `mat-dialog-container-scrollable` class on the container', () => {
+      const container = overlayContainerElement.querySelector('mat-dialog-container')!;
+      expect(container.classList).toContain('mat-dialog-container-scrollable');
+    });
+
+    it('should set the `mat-dialog-component-host` class on the rendered component', () => {
+      const container = overlayContainerElement.querySelector('mat-dialog-container')!;
+      const host = container.querySelector('content-element-dialog')!;
+
+      expect(host.classList).toContain('mat-dialog-component-host');
+    });
+
   });
 
   describe('aria-label', () => {
@@ -1273,6 +1285,7 @@ class PizzaMsg {
 }
 
 @Component({
+  selector: 'content-element-dialog',
   template: `
     <h1 mat-dialog-title>This is the title</h1>
     <mat-dialog-content>Lorem ipsum dolor sit amet.</mat-dialog-content>
