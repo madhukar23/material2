@@ -14,7 +14,7 @@ import {
   NativeDateModule,
   SEP,
 } from '@angular/material/core';
-import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatFormFieldModule, MatFormField} from '@angular/material/form-field';
 import {By} from '@angular/platform-browser';
 import {NoopAnimationsModule} from '@angular/platform-browser/animations';
 import {MatInputModule} from '../input/index';
@@ -97,6 +97,29 @@ describe('MatDatepicker', () => {
         expect(document.querySelector('.mat-datepicker-dialog mat-dialog-container'))
             .not.toBeNull();
       });
+
+      it('should pass the datepicker theme color to the overlay', fakeAsync(() => {
+        testComponent.datepicker.color = 'primary';
+        testComponent.datepicker.open();
+        fixture.detectChanges();
+
+        let contentEl = document.querySelector('.mat-datepicker-content')!;
+
+        expect(contentEl.classList).toContain('mat-primary');
+
+        testComponent.datepicker.close();
+        fixture.detectChanges();
+        flush();
+
+        testComponent.datepicker.color = 'warn';
+        testComponent.datepicker.open();
+
+        contentEl = document.querySelector('.mat-datepicker-content')!;
+        fixture.detectChanges();
+
+        expect(contentEl.classList).toContain('mat-warn');
+        expect(contentEl.classList).not.toContain('mat-primary');
+      }));
 
       it('should open datepicker if opened input is set to true', () => {
         testComponent.opened = true;
@@ -749,13 +772,13 @@ describe('MatDatepicker', () => {
       beforeEach(fakeAsync(() => {
         fixture = createComponent(FormFieldDatepicker, [MatNativeDateModule]);
         fixture.detectChanges();
-
         testComponent = fixture.componentInstance;
       }));
 
       afterEach(fakeAsync(() => {
         testComponent.datepicker.close();
         fixture.detectChanges();
+        flush();
       }));
 
       it('should attach popup to mat-form-field underline', () => {
@@ -772,6 +795,41 @@ describe('MatDatepicker', () => {
         expect(fixture.debugElement.nativeElement.querySelector('mat-form-field').classList)
           .toContain('mat-form-field-should-float');
       });
+
+      it('should pass the form field theme color to the overlay', fakeAsync(() => {
+        testComponent.formField.color = 'primary';
+        testComponent.datepicker.open();
+        fixture.detectChanges();
+
+        let contentEl = document.querySelector('.mat-datepicker-content')!;
+
+        expect(contentEl.classList).toContain('mat-primary');
+
+        testComponent.datepicker.close();
+        fixture.detectChanges();
+        flush();
+
+        testComponent.formField.color = 'warn';
+        testComponent.datepicker.open();
+
+        contentEl = document.querySelector('.mat-datepicker-content')!;
+        fixture.detectChanges();
+
+        expect(contentEl.classList).toContain('mat-warn');
+        expect(contentEl.classList).not.toContain('mat-primary');
+      }));
+
+      it('should prefer the datepicker color over the form field one', fakeAsync(() => {
+        testComponent.datepicker.color = 'accent';
+        testComponent.formField.color = 'warn';
+        testComponent.datepicker.open();
+        fixture.detectChanges();
+
+        const contentEl = document.querySelector('.mat-datepicker-content')!;
+
+        expect(contentEl.classList).toContain('mat-accent');
+        expect(contentEl.classList).not.toContain('mat-warn');
+      }));
 
     });
 
@@ -1301,6 +1359,7 @@ class DatepickerWithToggle {
 class FormFieldDatepicker {
   @ViewChild('d') datepicker: MatDatepicker<Date>;
   @ViewChild(MatDatepickerInput) datepickerInput: MatDatepickerInput<Date>;
+  @ViewChild(MatFormField) formField: MatFormField;
 }
 
 
