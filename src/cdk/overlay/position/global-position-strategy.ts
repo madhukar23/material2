@@ -30,13 +30,9 @@ export class GlobalPositionStrategy implements PositionStrategy {
   private _width: string = '';
   private _height: string = '';
 
-  /* A lazily-created wrapper for the overlay element that is used as a flex container.  */
-  private _wrapper: HTMLElement | null = null;
-
-  constructor(private _document: any) {}
-
   attach(overlayRef: OverlayRef): void {
     this._overlayRef = overlayRef;
+    overlayRef.hostElement.classList.add('cdk-global-overlay-wrapper');
   }
 
   /**
@@ -142,8 +138,6 @@ export class GlobalPositionStrategy implements PositionStrategy {
   /**
    * Apply the position to the element.
    * @docs-private
-   *
-   * @returns Resolved when the styles have been applied.
    */
   apply(): void {
     // Since the overlay ref applies the strategy asynchronously, it could
@@ -153,17 +147,8 @@ export class GlobalPositionStrategy implements PositionStrategy {
       return;
     }
 
-    const element = this._overlayRef.overlayElement;
-
-    if (!this._wrapper && element.parentNode) {
-      this._wrapper = this._document.createElement('div');
-      this._wrapper!.classList.add('cdk-global-overlay-wrapper');
-      element.parentNode.insertBefore(this._wrapper!, element);
-      this._wrapper!.appendChild(element);
-    }
-
-    let styles = element.style;
-    let parentStyles = (element.parentNode as HTMLElement).style;
+    const styles = this._overlayRef.overlayElement.style;
+    const parentStyles = this._overlayRef.hostElement.style;
 
     styles.position = this._cssPosition;
     styles.marginTop = this._topOffset;
@@ -177,11 +162,9 @@ export class GlobalPositionStrategy implements PositionStrategy {
     parentStyles.alignItems = this._alignItems;
   }
 
-  /** Removes the wrapper element from the DOM. */
-  dispose(): void {
-    if (this._wrapper && this._wrapper.parentNode) {
-      this._wrapper.parentNode.removeChild(this._wrapper);
-      this._wrapper = null;
-    }
-  }
+  /**
+   * Noop implemented as a part of the PositionStrategy interface.
+   * @docs-private
+  */
+  dispose(): void { }
 }
