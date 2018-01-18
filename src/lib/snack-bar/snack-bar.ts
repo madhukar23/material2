@@ -64,7 +64,7 @@ export class MatSnackBar {
     const snackBarRef = this._attach(component, _config);
 
     // When the snackbar is dismissed, clear the reference to it.
-    snackBarRef.afterDismissed().subscribe(() => {
+    snackBarRef.afterClosed().subscribe(() => {
       // Clear the snackbar ref if it hasn't already been replaced by a newer snackbar.
       if (this._openedSnackBarRef == snackBarRef) {
         this._openedSnackBarRef = null;
@@ -74,10 +74,10 @@ export class MatSnackBar {
     if (this._openedSnackBarRef) {
       // If a snack bar is already in view, dismiss it and enter the
       // new snack bar after exit animation is complete.
-      this._openedSnackBarRef.afterDismissed().subscribe(() => {
+      this._openedSnackBarRef.afterClosed().subscribe(() => {
         snackBarRef.containerInstance.enter();
       });
-      this._openedSnackBarRef.dismiss();
+      this._openedSnackBarRef.close();
     } else {
       // If no snack bar is in view, enter the new snack bar.
       snackBarRef.containerInstance.enter();
@@ -85,7 +85,7 @@ export class MatSnackBar {
 
     // If a dismiss timeout is provided, set up dismiss based on after the snackbar is opened.
     if (_config.duration && _config.duration > 0) {
-      snackBarRef.afterOpened().subscribe(() => snackBarRef._dismissAfter(_config!.duration!));
+      snackBarRef.afterOpened().subscribe(() => snackBarRef._closeAfter(_config!.duration!));
     }
 
     if (_config.announcementMessage) {
@@ -115,12 +115,20 @@ export class MatSnackBar {
   }
 
   /**
+   * Closes the currently-visible snack bar.
+   */
+  close(): void {
+    if (this._openedSnackBarRef) {
+      this._openedSnackBarRef.close();
+    }
+  }
+
+  /**
    * Dismisses the currently-visible snack bar.
+   * @deprecated Use `close` instead.
    */
   dismiss(): void {
-    if (this._openedSnackBarRef) {
-      this._openedSnackBarRef.dismiss();
-    }
+    this.close();
   }
 
   /**
